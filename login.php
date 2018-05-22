@@ -6,6 +6,7 @@ session_start();
 <html>
 <head>
 <title>Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
     body {
         font-family: "Times New Roman", Times, serif;
@@ -22,7 +23,6 @@ session_start();
         transform: translateX(-50%) translateY(-50%);
     }
     .topBar {
-        position: relative;
         border-style: solid;
         border-width: 0px 0px 1px 0px;
         border-color: #000000;
@@ -38,7 +38,6 @@ session_start();
     }
     #loginPage {
         text-align: center;
-        vertical-align: middle;
     }
     input[type=text],
     input[type=password] {
@@ -55,6 +54,10 @@ session_start();
     .errMessage {
         color: #FF0000;
     }
+    i.fa.fa-exclamation-circle {
+        font-size: 14px;
+        color: #FF0000;
+    }
     .button {
         background-color: #CCCCCC;
         border: 1px solid #000000;
@@ -65,6 +68,10 @@ session_start();
         font-weight: bold;
         font-size: 1.2em;
         cursor: pointer;
+    }
+    .button:hover {
+        background-color: #BBBBBB;
+        /*box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);*/
     }
 </style>
 </head>
@@ -112,7 +119,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         else {
-            $errMessage = "* Login is not successful. Please try signing in again.";
+            $errMessage = "<i class='fa fa-exclamation-circle'></i> Login is not successful. Please try signing in again.";
         }
 
         $stmt->free_result();
@@ -135,7 +142,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 Password: <input type="password" name="password" required>
             </div>
             <br/><br/>
-            <button class="button" type="submit">Login</button>
+            <input class="button" type="submit" value="Login">
         </form>
         <br/>
         <!--New Owner Registration-->
