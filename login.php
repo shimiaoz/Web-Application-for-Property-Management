@@ -14,6 +14,7 @@ session_start();
     }
     .main {
         position: absolute;
+        text-align: center;
         border: 1px solid #000000;
         background-color: #F3F3F3;
         width: 600px;
@@ -28,28 +29,38 @@ session_start();
         border-color: #000000;
         background-color: #CCCCCC;
         width: 100%;
-        height: 10%;
+        height: 35px;
     }
     .title {
-        text-align: center;
-        padding-top: 10px;
-        padding-bottom: 25px;
+        padding-top: 15px;
+        padding-bottom: 20px;
         font-size: 1.8em;
     }
-    #loginPage {
-        text-align: center;
+    .label-col {
+        float: left;
+        width: 30%;
+        margin-top: 12px;
+        font-size: 1.15em;
+        text-align: right;
+    }
+    .input-col {
+        float: left;
+        box-sizing: border-box;
+        width: 70%;
+        padding-left: 10px;
+        margin-top: 12px;
+        text-align: left;
     }
     input[type=text],
     input[type=password] {
-        width: 65%;
-        margin: 0px 2px;
+        width: 72%;
+        border: 0.5px solid;
+        font-size: 1.05em;
     }
-    .input {
-        width: 75%;
-        padding: 5px 12px;
-        text-align: right;
-        font-size: 1.2em;
-        transform: translateX(5%)
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
     }
     .errMessage {
         color: #FF0000;
@@ -78,16 +89,18 @@ session_start();
 <body>
 
 <?php
-require 'dbinfo.php';
+require "dbinfo.php";
 
 $email = $errMessage = "";
 
-if($_SERVER["REQUEST_METHOD"] == "POST") {
+if($_SERVER["REQUEST_METHOD"] == "POST")
+{
     // Connect to database
     $connection = new mysqli($host, $usernameDB, $passwordDB, $database);
-    if ($connection->connect_errno) {
+    if ($connection->connect_errno)
+    {
         //printf("Unable to Connect: %s\n", mysqli_connect_error());
-        echo "Unable to Connect";
+        $errMessage = "System unavailable. Please try again later.";
         exit();
     }
 
@@ -96,7 +109,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $query = "SELECT * FROM User WHERE Email=? AND Password=?";
 
     // Retrieve the record
-    if($stmt = $connection->prepare($query)) {
+    if($stmt = $connection->prepare($query))
+    {
         $stmt->bind_param("ss", $email, $hashPswd);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -106,19 +120,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             $row = $result->fetch_assoc();
 
             // Check UserType and redirect to the corresponding main page
-            if($row["UserType"] == "OWNER"){
+            if($row["UserType"] == "OWNER")
+            {
                 header("Location: owner_function.php?email=$email");
             }
-            else if($row["UserType"] == "VISITOR"){
+            elseif($row["UserType"] == "VISITOR")
+            {
                 $visitor_username = $row["Username"];
                 header("Location: visitor_main_page.php?name=$visitor_username");
             }
-            else if($row["UserType"] == "ADMIN"){
+            elseif($row["UserType"] == "ADMIN")
+            {
                 $admin_username = $row["Username"];
                 header("Location: admin_menu.php?name=$admin_username");
             }
         }
-        else {
+        else
+        {
             $errMessage = "<i class='fa fa-exclamation-circle'></i> Login is not successful. Please try signing in again.";
         }
 
@@ -131,15 +149,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="main">
     <div class="topBar"></div>
-    <div class="title">Welcome to Property Management System</div>
     <div id="loginPage">
+        <div class="title">Welcome to Property Management System</div>
         <?php echo "<span class=errMessage>" . $errMessage . "</span>"; ?><br/>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="input">
-                Email: <input type="text" name="email" value="<?php echo $email; ?>" required>
+        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+            <div class="row">
+                <div class="label-col"><label>Email:</label></div>
+                <div class="input-col">
+                    <input type="text" name="email" value="<?php echo $email; ?>" required>
+                </div>
             </div>
-            <div class="input">
-                Password: <input type="password" name="password" required>
+            <div class="row">
+                <div class="label-col"><label>Password:</label></div>
+                <div class="input-col">
+                    <input type="password" name="password" required>
+                </div>
             </div>
             <br/><br/>
             <input class="button" type="submit" value="Login">
@@ -148,7 +172,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         <!--New Owner Registration-->
         <input class="button" type="button" onclick="location.href='register_owner.php';" value="New Owner Registration">
         <!--New Visitor Registration-->
-        <input class="button" type="button" onclick="location.href='register.php';" value="New Visitor Registration">
+        <input class="button" type="button" onclick="location.href='register_visitor.php';" value="New Visitor Registration">
     </div>
 </div>
 
