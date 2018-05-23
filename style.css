@@ -1,0 +1,137 @@
+body {
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+}
+
+.main {
+    position: absolute;
+    text-align: center;
+    border: 1px solid #000000;
+    background-color: #F3F3F3;
+    width: 600px;
+    height: 350px;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.topBar {
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    border-color: #000000;
+    background-color: #CCCCCC;
+    width: 100%;
+    height: 35px;
+}
+
+.title {
+    padding: 15px 0;
+    font-size: 1.8em;
+}
+
+.label-col {
+    float: left;
+    width: 30%;
+    margin-top: 12px;
+    font-size: 1.15em;
+    text-align: right;
+}
+
+.input-col {
+    float: left;
+    box-sizing: border-box;
+    width: 70%;
+    padding-left: 10px;
+    margin-top: 12px;
+    text-align: left;
+}
+
+.input-col input[type=text],
+.input-col input[type=password] {
+    box-sizing: border-box;
+    width: 72%;
+    border: 0.5px solid;
+    padding-left: 5px;
+    font-size: 1.05em;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.errMessage {
+    color: #FF0000;
+}
+
+i.fa.fa-exclamation-circle {
+    font-size: 14px;
+    color: #FF0000;
+}
+
+i.fa.fa-info-circle {
+    position: relative;
+    font-size: 14px;
+    color: #696969;
+}
+
+i.fa.fa-info-circle:hover {
+    color: #353535;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    position: absolute;
+    visibility: hidden;
+    width: 90px;
+    background-color: #CCCCCC;
+    color: #000000;
+    text-align: center;
+    border-radius: 4px;
+    padding: 2px 2px;
+    z-index: 1;
+    top: -7px;
+    left: 150%;
+    font-size: 0.75em;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #BCBCBC transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.button-bottom {
+    margin-top: 35px;
+}
+
+.button {
+    background-color: #CCCCCC;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    padding: 5px 8px;
+    margin: 0px 12px;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #BBBBBB;
+    /*box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);*/
+}
