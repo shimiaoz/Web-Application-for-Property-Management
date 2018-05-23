@@ -118,7 +118,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                     <span class="tooltiptext">Require at least 8 characters</span>
                 </div>
             </div>
-
         </div>
         <div class="row">
             <div class="label-col">Confirm password:</label></div>
