@@ -5,11 +5,18 @@ session_start();
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="style.css">
-<style>
-</style>
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+    .label-col {
+        font-size: 1.15em;
+    }
+
+    .input-col input {
+        font-size: 1.05em;
+    }
+    </style>
 </head>
 <body>
 
