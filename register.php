@@ -1,15 +1,23 @@
 <?php
-// Start the session
 session_start();
 ?>
 
 <!DOCTYPE html>
 <html>
-<title>Visitor Registration</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="style.css">
-<style>
-</style>
+<head>
+    <title>Visitor Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+    .label-col {
+        font-size: 1.15em;
+    }
+
+    .input-col input {
+        font-size: 1.05em;
+    }
+    </style>
+</head>
 <body>
 
 <?php
@@ -25,9 +33,10 @@ if (isset($_SESSION["connection_failure_message"]))
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
-    $username = $_POST["name"];
+    $username = $_POST["username"];
     $email = $_POST["email"];
     $password = $_POST["password"];
+    $hashPswd = md5($password);
     //$pslength = strlen($_POST['password']);
 
     if (filter_var($email, FILTER_VALIDATE_EMAIL) == false)
@@ -66,10 +75,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             $tmp_stmt->free_result();
             $tmp_stmt->close();
         }
-        // Register the new account
+        // Register the new visitor account
         else
         {
-            $hashPswd = md5($password);
             $query = "INSERT INTO User(Username, Email, Password, UserType) VALUES(?, ?, ?, 'VISITOR')";
             
             $stmt = $connection->prepare($query);
@@ -100,11 +108,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         <div class="row">
             <div class="label-col"><label>Username:</label></div>
             <div class="input-col">
-                <input type="text" name="name" value="<?php echo $username; ?>" required>
+                <input type="text" name="username" value="<?php echo $username; ?>" required>
             </div>
         </div>
         <div class="row">
-            <div class="label-col">E-mail:</label></div>
+            <div class="label-col">Email:</label></div>
             <div class="input-col">
                 <input type="text" name="email" value="<?php echo $email; ?>" required>
             </div>
