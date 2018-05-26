@@ -77,6 +77,15 @@ body {
     width: 100%;
 }
 
+input[type=number] {
+    -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
 .row:after {
     content: "";
     display: table;
@@ -156,4 +165,101 @@ i.fa.fa-info-circle:hover {
 .button:hover {
     background-color: #BBBBBB;
     /*box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);*/
+}
+
+.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}
+
+.table {
+    height: 50%;
+    overflow-y: auto;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0px;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    margin: 0 auto;
+    width: 95%;
+}
+
+table caption {
+    text-align: left;
+    padding: 0px 0px 5px 0px;
+    font-size: 1.20em;
+}
+
+th, td {
+    border-top: 1px solid #000000;
+    border-left: 1px solid #000000;
+    text-align: left;
+    padding: 3px;
+}
+
+tr:nth-child(even) {
+    background-color: #FFFFFF;
+}
+
+tr:hover {
+    background-color: #D4D4D4;
+}
+
+th {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    text-align: left;
+    background-color: #CCCCCC;
+}
+
+tr {
+    font-weight: normal;
+}
+
+#bottom-fields {
+    height: 25%;
+}
+
+.col-33 {
+    box-sizing: border-box;
+    position: relative;
+    display: inline-block;
+    width: 33%;
+    height: 100%;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+.col-33 .fields {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.col-33 .fields .button,
+.col-33 .fields select,
+.col-33 .fields .term {
+    box-sizing: border-box;
+    width: 60%;
+    margin: 2px auto;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.col-33 .fields .range {
+    width: 28.3%;
+    text-align: left;
 }
