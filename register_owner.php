@@ -27,7 +27,6 @@ session_start();
     </style>
 </head>
 <body>
-
 <?php
 require 'dbinfo.php';
 
@@ -202,7 +201,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             </div>
             <div class="label-col short"><label>Acres:</label></div>
             <div class="input-col short">
-                <input type="number" name="acres" value="<?php echo $acres; ?>" required>
+                <input type="number" name="acres" step="any" value="<?php echo $acres; ?>" required>
             </div>
         </div>
 
