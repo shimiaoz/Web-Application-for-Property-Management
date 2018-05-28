@@ -78,12 +78,12 @@ body {
 }
 
 input[type=number] {
-    -moz-appearance:textfield;
+    -moz-appearance: textfield;
 }
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+    -webkit-appearance: none; 
+    margin: 0;
 }
 
 .row:after {
@@ -109,6 +109,17 @@ i.fa.fa-info-circle {
 
 i.fa.fa-info-circle:hover {
     color: #353535;
+}
+
+i.fa.fa-chevron-circle-up,
+i.fa.fa-chevron-circle-down {
+    font-size: 14px;
+    color: #000000;
+}
+
+i.fa.fa-chevron-circle-up:hover,
+i.fa.fa-chevron-circle-down:hover {
+    cursor: pointer;
 }
 
 .tooltip {
@@ -173,7 +184,7 @@ i.fa.fa-info-circle:hover {
     top: 0;
 }
 
-.table {
+.table-div {
     height: 50%;
     overflow-y: auto;
 }
@@ -266,4 +277,13 @@ tr {
 
 a {
     text-decoration: none;
+}
+
+table a:hover {
+    text-decoration: underline solid #0000FF;
+}
+
+.sort-icon {
+    float: right;
+    padding-right: 5%;
 }
