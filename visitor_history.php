@@ -1,83 +1,68 @@
-<html>
-<body>
 <?php
 session_start();
-require 'dbinfo.php';
-
-$connection = mysqli_connect($host, $usernameDB, $passwordDB, $database);
-if(isset($_GET['PropertyName'])) {
-    $P_Name = $_GET['PropertyName'];
-    $query = "SELECT ID from Property WHERE Name='$P_Name'";
-    $result = mysqli_query($connection, $query);
-    $row = mysqli_fetch_assoc($result);
-    $ID = $row['ID'];
-    header("Location: property_details.php/?ID=$ID");
-}
-
-if(isset($_GET['name'])){
-    $username = $_GET['name'];
-}
-$query = "SELECT Property.Name, Visit.VisitDate, Visit.Rating FROM Visit LEFT JOIN Property ON Property.ID=Visit.PropertyID WHERE Visit.Username='$username'";
-echo "<table>";
-echo "<tr>";
-echo "<th>Name <a href='visitor_history.php?name=$username&sort_name=0'>↑</a> <a href='visitor_history.php?name=$username&sort_name=1'>↓</a></th>";
-echo "<th>Date Logged<a href='visitor_history.php?name=$username&sort_date=0'>↑</a> <a href='visitor_history.php?name=$username&sort_date=1'>↓</a></th>";
-echo "<th>Rating<a href='visitor_history.php?name=$username&sort_rate=0'>↑</a> <a href='visitor_history.php?name=$username&sort_rate=1'>↓</a> </th>";
-echo "</tr>";
-echo "<tr>";
-if(isset($_GET['sort_name'])) {
-    $temp_order = $_GET['sort_name'];
-    if($temp_order==0) {
-        $query = $query. " order by Property.Name asc";
-    } else {
-        $query = $query. " order by Property.Name desc";
-    }
-}
-if(isset($_GET['sort_date'])) {
-    $temp_order = $_GET['sort_date'];
-    if($temp_order==0) {
-        $query = $query. " order by Visit.VisitDate asc";
-    } else {
-        $query = $query. " order by Visit.VisitDate desc";
-    }
-}
-if(isset($_GET['sort_rate'])) {
-    $temp_order = $_GET['sort_rate'];
-    if($temp_order==0) {
-        $query = $query. " order by Visit.Rating asc";
-    } else {
-        $query = $query. " order by Visit.Rating desc";
-    }
-}
-$result = mysqli_query($connection, $query);
-if(mysqli_num_rows($result) > 0) {
-    while($row = mysqli_fetch_assoc($result))
-    {
-        $name = $row['Name'];
-        echo "<td><a href='visitor_history.php?name=$username&PropertyName=".$name."'>$name</a></td>";
-        echo "<td>";
-        echo $row['VisitDate'];
-        echo "</td>";
-        echo "<td>";
-        echo $row['Rating'];
-        echo "</td>";
-        echo "</tr>";
-        echo "<tr>";
-    }
-    echo "</tr>";
-}
-else {
-    echo "No visited history";
-}
-echo "</table>";
-
-if(isset($_GET['name'])){
-    $username = $_GET['name'];
-    echo "<a href='visitor_main_page.php?name=$username'>Back</a><br/>";
-}
-
-mysqli_close($connection);
 ?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visit History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .button-bottom {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<?php
+require 'dbinfo.php';
+
+echo <<<EOT
+<div class="main">
+    <div class="topBar"></div>
+    <div class="title">Your Visit History</div>
+    <div class="table-div">
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_name', 0)"></i></span></th>
+                    <th>Date Logged<span id="sort_date" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_date', 1)"></i></span></th>
+                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_rating', 2)"></i></span></th>
+                </tr>
+            </thead>
+EOT;
+
+$connection = new mysqli($host, $usernameDB, $passwordDB, $database);
+$username = $_GET['name'];
+$query = "SELECT Property.ID, Property.Name, Visit.VisitDate, Visit.Rating FROM Visit LEFT JOIN Property ON Property.ID = Visit.PropertyID WHERE Visit.Username='$username'";
+$result = $connection->query($query);
+
+if($result->num_rows > 0)
+{
+    while($row = $result->fetch_assoc())
+    {
+        echo "<tr>";
+        $name = $row['Name'];
+        $ID = $row['ID'];
+        echo "<td><a href='property_details.php?ID=$ID'>$name</a></td>";
+        echo "<td>" . $row['VisitDate']. "</td>";
+        echo "<td>" . $row['Rating'] . "</td>";
+        echo "</tr>";
+    }
+}
+echo "</table>";
+echo "</div>";
+
+echo <<<EOT
+    <div class="button-bottom">
+        <input class="button" type="button" onclick="location.href='visitor_main_page.php?name=$username';" value="Back">
+    </div>
+EOT;
+echo "</div>";
+
+$connection->close();
+?>
+<script src="helperFunctions.js"></script>
 </body>
 </html>
