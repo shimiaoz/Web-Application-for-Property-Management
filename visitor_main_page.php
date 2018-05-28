@@ -26,95 +26,25 @@ echo <<<EOT
 <div class="main">
     <div class="topBar"></div>
     <div class="title">Welcome $username</div>
-    <div class="table">
-        <table>
+    <div class="table-div">
+        <table id="table">
             <caption>All Public, Confirmed Properties</caption>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name<a href="visitor_main_page.php?name=$username&sort_by_name=0"><span id="name_asc" class="sort-icon"><i class="fa fa-chevron-circle-up"></i></span></a>
-                            <a href="visitor_main_page.php?name=$username&sort_by_name=1"><i class="fa fa-chevron-circle-down"></i></a></th>
-                    <th>Street</th>
-                    <th>City<a href="visitor_main_page.php?name=$username&sort_by_city=0"></span></a>
-                            <a href="visitor_main_page.php?name=$username&sort_by_city=1"></a></th>
-                    <th>Zip</th>
-                    <th>Size</th>
-                    <th>Property Type<a href="visitor_main_page.php?name=$username&sort_by_propertyType=0"></a>
-                                    <a href="visitor_main_page.php?name=$username&sort_by_propertyType=1"></a></th>
-                    <th>isPublic</th>
-                    <th>isCommercial</th>
-                    <th>Visits<a href="visitor_main_page.php?name=$username&sort_by_visits=0">↑</a>
-                              <a href="visitor_main_page.php?name=$username&sort_by_visits=1">↓</a></th>
-                    <th>Avg. Rating<a href="visitor_main_page.php?name=$username&sort_by_avgRating=0">↑</a>
-                                   <a href="visitor_main_page.php?name=$username&sort_by_avgRating=1">↓</a></th>
+                    <th>ID<span id="sort_id" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_id', 0)"></i></span></th>
+                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_name', 1)"></i></span></th>
+                    <th>Street<span id="sort_street" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_street', 2)"></i></span></th>
+                    <th>City<span id="sort_city" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_city', 3)"></i></span></th>
+                    <th>Zip<span id="sort_zip" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_zip', 4)"></i></span></th>
+                    <th>Size<span id="sort_size" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_size', 5)"></i></span></th>
+                    <th>Property Type<span id="sort_propertyType" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_propertyType', 6)"></i></span></th>
+                    <th>isPublic<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_public', 7)"></i></span></th>
+                    <th>isCommercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_commercial', 8)"></i></span></th>
+                    <th>Visits<span id="sort_visits" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_visits', 9)"></i></span></th>
+                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_rating', 10)"></i></span></th>
                 </tr>
             </thead>
 EOT;
-
-if (isset($_GET["sort_by_name"]))
-{
-    $temp_order = $_GET["sort_by_name"];
-    if ($temp_order == 0)
-        $query .= " order by Name asc";
-    else
-        $query .= " order by Name desc";
-}
-elseif (isset($_GET["sort_by_city"]))
-{
-    $temp_order = $_GET["sort_by_city"];
-    if ($temp_order == 0)
-        $query .= " order by City asc";
-    else
-        $query .= " order by City desc";
-}
-elseif (isset($_GET["sort_by_propertyType"]))
-{
-    $temp_order = $_GET["sort_by_propertyType"];
-    if ($temp_order == 0)
-        $query .= " order by PropertyType asc";
-    else
-        $query .= " order by PropertyType desc";
-}
-elseif (isset($_GET["sort_by_visits"]))
-{
-    $temp_order = $_GET["sort_by_visits"];
-    if ($temp_order == 0)
-    {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL AND p.IsPublic = 1
-                  GROUP BY p.ID
-                  ORDER BY count(v.PropertyID) ASC";
-    }
-    else
-    {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL AND p.IsPublic = 1
-                  GROUP BY p.ID
-                  ORDER BY count(v.PropertyID) DESC";
-    }
-}
-elseif (isset($_GET["sort_by_avgRating"]))
-{
-    $temp_order = $_GET["sort_by_avgRating"];
-    if ($temp_order == 0)
-    {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL AND p.IsPublic = 1
-                  GROUP BY p.ID
-                  ORDER BY AVG(Rating) ASC";
-    }
-    else
-    {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL AND p.IsPublic = 1
-                  GROUP BY p.ID
-                  ORDER BY AVG(Rating) DESC";
-    }
-}
 
 $result = $connection->query($query);
 
@@ -133,12 +63,15 @@ if (isset($_POST["SearchBy"]))
         $To = $_POST["To"];
         if (is_numeric($From) && is_numeric($To))
         {
-            if ($attr=="Visits")
+            if ($attr == "Size")
+                $query .= " AND (ID IN (SELECT p.ID FROM Property as p
+                                               WHERE p.Size >= $From AND p.Size <= $To))";
+            elseif ($attr == "Visits")
                 $query .= " AND (ID IN (SELECT p.ID FROM Property as p
                                                LEFT JOIN Visit AS v ON p.ID = v.PropertyID
                                                GROUP BY p.ID 
                                                HAVING COUNT(v.PropertyID) >= $From AND COUNT(v.PropertyID) <= $To))";
-            elseif ($attr == "Avg. Rating")
+            elseif ($attr == "Rating")
                 $query .= " AND (ID IN (SELECT p.ID FROM Property as p
                                                LEFT JOIN Visit AS v ON p.ID = v.PropertyID
                                                GROUP BY p.ID
@@ -207,15 +140,15 @@ echo <<<EOT
                 <div>
                     <select id="visitorSearch" onchange="searchRange()" name="SearchBy">
                         <option value="" disabled selected>Search by</option>
+                        <option value="ID">ID</option>
                         <option value="Name">Name</option>
                         <option value="Street">Street</option>
                         <option value="City">City</option>
                         <option value="Zip">Zip</option>
                         <option value="Size">Size</option>
                         <option value="PropertyType">Property Type</option>
-                        <option value="ID">ID</option>
                         <option value="Visits">Visits</option>
-                        <option value="Avg. Rating">Avg. Rating</option>
+                        <option value="Rating">Rating</option>
                     </select>
                 </div>
                 <div id="term-input">
@@ -254,9 +187,58 @@ $connection->close();
 ?>
 
 <script>
+function sortTable(id, col) {
+    // Change icon and determine sort order
+    var icon = document.getElementById(id).getElementsByTagName("i")[0];
+    var sortBy;
+    if (icon.className == "fa fa-chevron-circle-down") {
+        icon.className = "fa fa-chevron-circle-up";
+        sortBy = "desc";
+    }
+    else {
+        icon.className = "fa fa-chevron-circle-down";
+        sortBy = "asc";
+    }
+
+    // Sort table by sortBy
+    // Modified from https://www.w3schools.com/howto/howto_js_sort_table.asp
+    var table = document.getElementById("table");
+    var continueSort = true;
+    var swap = false;
+    var rows;
+    while (continueSort) {
+        rows = table.getElementsByTagName("tr");
+        continueSort = false;
+        for (var i = 1; i < rows.length - 1; i++) {
+            swap = false;
+            var curr = rows[i].getElementsByTagName("td")[col];
+            var next = rows[i+1].getElementsByTagName("td")[col];
+            if (id == "sort_id") {
+                // Entries in the id column are links
+                curr = curr.getElementsByTagName("a")[0];
+                next = next.getElementsByTagName("a")[0];
+            }
+            var currData = curr.innerHTML.toLowerCase();
+            var nextData = next.innerHTML.toLowerCase();
+            if (!isNaN(currData) && !isNaN(nextData)) {
+                currData = Number(currData);
+                nextData = Number(nextData);
+            }
+            if ((sortBy == "asc" && currData > nextData) || ((sortBy == "desc" && currData < nextData))) {
+                swap = true;
+                break;
+            }
+        }
+        if (swap) {
+            rows[i].parentNode.insertBefore(rows[i+1], rows[i]);
+            continueSort = true;
+        }
+    }
+}
+
 function searchRange() {
     var x = document.getElementById('visitorSearch').value;
-    if (x == "Visits" || x == "Avg. Rating") {
+    if (x == "Size" || x == "Visits" || x == "Rating") {
         document.getElementById("term-input").innerHTML = "<input class='term range' type='number' step='any' placeholder='From' name='From' required> - <input class='term range' type='number' step='any' placeholder='To' name='To' required>";
     } else {
         document.getElementById("term-input").innerHTML = "<input class='term' type='text' placeholder='Search Term' name='SearchTerm'>";
