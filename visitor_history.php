@@ -18,6 +18,8 @@ session_start();
 <?php
 require 'dbinfo.php';
 
+$_SESSION["Current_Page"] = htmlspecialchars($_SERVER["PHP_SELF"]);
+
 echo <<<EOT
 <div class="main">
     <div class="topBar"></div>
@@ -26,9 +28,9 @@ echo <<<EOT
         <table id="table">
             <thead>
                 <tr>
-                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_name', 0)"></i></span></th>
-                    <th>Date Logged<span id="sort_date" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_date', 1)"></i></span></th>
-                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_rating', 2)"></i></span></th>
+                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_name', 0)"></i></span></th>
+                    <th>Date Logged<span id="sort_date" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_date', 1)"></i></span></th>
+                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_rating', 2)"></i></span></th>
                 </tr>
             </thead>
 EOT;
