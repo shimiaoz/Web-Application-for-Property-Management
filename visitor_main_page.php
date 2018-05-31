@@ -9,15 +9,18 @@ session_start();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
-    .main {
-        width: 1100px;
-        min-height: 450px;
-    }
+        .main {
+            width: 1100px;
+            min-height: 450px;
+        }
     </style>
 </head>
 <body>
 <?php
 require 'dbinfo.php';
+
+$_SESSION["Current_Page"] = htmlspecialchars($_SERVER["PHP_SELF"]);
+
 $connection = new mysqli($host, $usernameDB, $passwordDB, $database);
 $query = "SELECT * FROM Property WHERE ApprovedBy IS NOT NULL AND IsPublic = 1";
 
@@ -31,17 +34,17 @@ echo <<<EOT
             <caption>All Public, Confirmed Properties</caption>
             <thead>
                 <tr>
-                    <th>ID<span id="sort_id" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_id', 0)"></i></span></th>
-                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_name', 1)"></i></span></th>
-                    <th>Street<span id="sort_street" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_street', 2)"></i></span></th>
-                    <th>City<span id="sort_city" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_city', 3)"></i></span></th>
-                    <th>Zip<span id="sort_zip" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_zip', 4)"></i></span></th>
-                    <th>Size<span id="sort_size" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_size', 5)"></i></span></th>
-                    <th>Property Type<span id="sort_propertyType" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_propertyType', 6)"></i></span></th>
-                    <th>isPublic<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_public', 7)"></i></span></th>
-                    <th>isCommercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_commercial', 8)"></i></span></th>
-                    <th>Visits<span id="sort_visits" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_visits', 9)"></i></span></th>
-                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" onclick="sortTable('sort_rating', 10)"></i></span></th>
+                    <th>ID<span id="sort_id" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_id', 0)"></i></span></th>
+                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_name', 1)"></i></span></th>
+                    <th>Street<span id="sort_street" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_street', 2)"></i></span></th>
+                    <th>City<span id="sort_city" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_city', 3)"></i></span></th>
+                    <th>Zip<span id="sort_zip" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_zip', 4)"></i></span></th>
+                    <th>Size<span id="sort_size" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_size', 5)"></i></span></th>
+                    <th>Property Type<span id="sort_propertyType" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_propertyType', 6)"></i></span></th>
+                    <th>isPublic<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_public', 7)"></i></span></th>
+                    <th>isCommercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_commercial', 8)"></i></span></th>
+                    <th>Visits<span id="sort_visits" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_visits', 9)"></i></span></th>
+                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_rating', 10)"></i></span></th>
                 </tr>
             </thead>
 EOT;
@@ -89,12 +92,7 @@ if ($result != False && $result->num_rows > 0)
         echo "<tr>";
         echo "<td>";
         $tmp_ID = $row['ID'];
-        $check_log_query = "SELECT * FROM Visit WHERE Username = '$username' AND PropertyID = $tmp_ID";
-        $check_log_result = $connection->query($check_log_query);
-        if ($check_log_result->num_rows == 0)
-            echo "<a href='visitor_property_page.php?username=$username&ID=$tmp_ID'>" . str_pad($row['ID'], 5, '0', STR_PAD_LEFT) . "</a>";
-        else
-            echo "<a href='visitor_property_logged.php?username=$username&ID=$tmp_ID'>" . str_pad($row['ID'], 5, '0', STR_PAD_LEFT) . "</a>";
+        echo "<a href='property_details.php?ID=$tmp_ID'>" . str_pad($row['ID'], 5, '0', STR_PAD_LEFT) . "</a>";
         echo "</td>";
         echo "<td>" .$row['Name']. "</td>";
         echo "<td>" .$row['Street']. "</td>";
@@ -102,28 +100,16 @@ if ($result != False && $result->num_rows > 0)
         echo "<td>" .$row['Zip']. "</td>";
         echo "<td>" .number_format($row['Size'], 1). "</td>";
         echo "<td>" .ucwords(strtolower($row['PropertyType'])). "</td>";
-        if ($row['IsPublic'] == "1")
-            echo "<td>True</td>";
-        else
-            echo "<td>False</td>";
-        if ($row['IsCommercial'] == "1")
-            echo "<td>True</td>";
-        else
-            echo "<td>False</td>";
-        echo "<td>";
+        echo "<td>" .(boolval($row["IsPublic"])? "True" : "False"). "</td>";
+        echo "<td>" .(boolval($row["IsCommercial"])? "True" : "False"). "</td>";
         $num_visits_query = "SELECT COUNT(*) as num_visits FROM Visit WHERE PropertyID = $tmp_ID";
         $num_visits_result = $connection->query($num_visits_query);
         $tmp_row = $num_visits_result->fetch_assoc();
-        echo $tmp_row['num_visits'];
-        echo "</td>";
-        echo "<td>";
+        echo "<td>" .$tmp_row["num_visits"]. "</td>";
         $avgRating_query = "SELECT AVG(Rating) as avgRating FROM Visit WHERE PropertyID = $tmp_ID";
         $avgRating_result = $connection->query($avgRating_query);
         $tmp_row = $avgRating_result->fetch_assoc();
-        if (is_numeric($tmp_row['avgRating'])){
-            echo number_format($tmp_row['avgRating'], 2);
-        }
-        echo "</td>";
+        echo "<td>" .number_format($tmp_row["avgRating"], 2). "</td>";
         echo "</tr>";
     }
     echo "</tbody>";
