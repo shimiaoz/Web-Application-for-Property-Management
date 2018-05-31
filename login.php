@@ -47,28 +47,30 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     $query = "SELECT * FROM User WHERE Email=? AND Password=?";
 
     // Retrieve the record
-    if($stmt = $connection->prepare($query))
+    if ($stmt = $connection->prepare($query))
     {
         $stmt->bind_param("ss", $email, $hashPswd);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        $num_of_rows = $result->num_rows;
-        if($num_of_rows == 1) {
+        if ($result->num_rows == 1)
+        {
             $row = $result->fetch_assoc();
-
             // Check UserType and redirect to the corresponding main page
-            if($row["UserType"] == "OWNER")
+            if ($row["UserType"] == "OWNER")
             {
+                $_SESSION["USER"] = array("UserType"=>"OWNER", "Username"=>$row["Username"]);
                 header("Location: owner_function.php?email=$email");
             }
             elseif($row["UserType"] == "VISITOR")
             {
+                $_SESSION["USER"] = array("UserType"=>"VISITOR", "Username"=>$row["Username"]);
                 $visitor_username = $row["Username"];
                 header("Location: visitor_main_page.php?name=$visitor_username");
             }
             elseif($row["UserType"] == "ADMIN")
             {
+                $_SESSION["USER"] = array("UserType"=>"ADMIN", "Username"=>$row["Username"]);
                 $admin_username = $row["Username"];
                 header("Location: admin_menu.php?name=$admin_username");
             }
