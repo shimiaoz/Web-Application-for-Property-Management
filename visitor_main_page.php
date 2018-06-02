@@ -13,7 +13,13 @@ session_start();
             width: 1100px;
             min-height: 450px;
         }
+
+        .tooltip .tooltiptext {
+            width: 65px;
+            top: 0px;
+        }
     </style>
+    <script src="helperFunctions.js"></script>
 </head>
 <body>
 <?php
@@ -49,8 +55,6 @@ echo <<<EOT
             </thead>
 EOT;
 
-$result = $connection->query($query);
-
 if (isset($_POST["SearchBy"]))
 {
     $attr = $_POST["SearchBy"];
@@ -58,7 +62,6 @@ if (isset($_POST["SearchBy"]))
     {
         $SearchTerm = $_POST["SearchTerm"];
         $query .= " AND ($attr LIKE '%$SearchTerm%')";
-        $result = $connection->query($query);
     }
     elseif (isset($_POST["From"]) && isset($_POST["To"]))
     {
@@ -79,10 +82,11 @@ if (isset($_POST["SearchBy"]))
                                                LEFT JOIN Visit AS v ON p.ID = v.PropertyID
                                                GROUP BY p.ID
                                                HAVING AVG(v.Rating) >= $From AND AVG(v.Rating) <= $To))";
-            $result = $connection->query($query);
         }
     }
 }
+
+$result = $connection->query($query);
 
 if ($result != False && $result->num_rows > 0)
 {
@@ -124,7 +128,7 @@ echo <<<EOT
         <div class="fields">
             <form action="visitor_main_page.php?name=$username" method="post">
                 <div>
-                    <select id="visitorSearch" onchange="searchRange()" name="SearchBy">
+                    <select id="visitorSearch" onchange="searchRange('visitorSearch')" name="SearchBy">
                         <option value="" disabled selected>Search by</option>
                         <option value="ID">ID</option>
                         <option value="Name">Name</option>
@@ -152,7 +156,16 @@ echo <<<EOT
     <div class="col-33">
         <div class="fields">
             <div>
+                <form action="property_details.php?ID=" id="property_details_form" method="post">
+                    <input id="invisible_field" type="text" class="button" placeholder="Select a property" required>
+                    <input class="button" type="Submit" value="View Selected Property">
+                    <div class="tooltip">
+                        <i class='fa fa-info-circle'></i>
+                        <span class="tooltiptext">Click a row</span>
+                    </div>
+                </form>
                 <input class="button" type="button" onclick="location.href='visitor_history.php?name=$username';" value="View Visit History">
+                <i class='fa fa-info-circle' style="visibility: hidden;"></i>
             </div>
         </div>
     </div>
@@ -171,6 +184,8 @@ echo "</div>"; // For div "main"
 
 $connection->close();
 ?>
-<script src="helperFunctions.js"></script>
+
+<script>selectRow(["property_details_form"], "action");</script>
+
 </body>
 </html>
