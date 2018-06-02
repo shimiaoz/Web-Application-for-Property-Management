@@ -1,4 +1,4 @@
-/* Helper JavaScript functions for displaying dynamic webpages*/
+/* Helper JavaScript functions for displaying dynamic webpages */
 
 function sortTable(id, col) {
     // Change icon and determine sort order
@@ -6,10 +6,12 @@ function sortTable(id, col) {
     var sortBy;
     if (icon.className == "fa fa-chevron-circle-down") {
         icon.className = "fa fa-chevron-circle-up";
+        icon.title = "Desc";
         sortBy = "desc";
     }
     else {
         icon.className = "fa fa-chevron-circle-down";
+        icon.title = "Asc";
         sortBy = "asc";
     }
 
@@ -49,11 +51,41 @@ function sortTable(id, col) {
     }
 }
 
-function searchRange() {
-    var x = document.getElementById('visitorSearch').value;
-    if (x == "Size" || x == "Visits" || x == "Rating") {
+function searchRange(id) {
+    var x = document.getElementById(id).value;
+    if (x == "Size" || x == "Visits" || x == "Rating" || x == "numProperty") {
         document.getElementById("term-input").innerHTML = "<input class='term range' type='number' step='any' placeholder='From' name='From' required> - <input class='term range' type='number' step='any' placeholder='To' name='To' required>";
-    } else {
+    }
+    else {
         document.getElementById("term-input").innerHTML = "<input class='term' type='text' placeholder='Search Term' name='SearchTerm'>";
+    }
+}
+
+function selectRow(idList, type="") {
+    var table = document.getElementById('table');
+
+    if (type === "action") {
+        var link = document.getElementById(idList[0]).action;
+    }
+
+    for(var i = 1; i < table.rows.length; i++) {
+        table.rows[i].onclick = function() {
+            rows = table.getElementsByTagName("tr")
+            for (var j = 1; j < rows.length; j++) {
+                rows[j].removeAttribute("id");
+            }
+            this.id = "selected";
+            //console.log(idList);
+            if (type === "action") {    //idList.length == 1
+                var idLink = this.cells[0].getElementsByTagName("a")[0];
+                document.getElementById(idList[0]).action = link + idLink.innerHTML;
+                document.getElementById("invisible_field").value = idLink.innerHTML;
+            }
+            else {
+                for (var i = 0; i < idList.length; i++) {
+                    document.getElementById(idList[i]).value = this.cells[0].innerHTML;
+                }
+            }
+        };
     }
 }
