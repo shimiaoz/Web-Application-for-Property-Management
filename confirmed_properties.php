@@ -1,185 +1,177 @@
-<html>
-<body>
 <?php
 session_start();
-require 'dbinfo.php';
-$connection = mysqli_connect($host, $usernameDB, $passwordDB, $database);
+?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmed Properties</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .main {
+            width: 1100px;
+            min-height: 450px;
+        }
+
+        .tooltip .tooltiptext {
+            width: 65px;
+            top: 0px;
+        }
+    </style>
+    <script src="helperFunctions.js"></script>
+</head>
+<body>
+<?php
+require 'dbinfo.php';
+
+$connection = new mysqli($host, $usernameDB, $passwordDB, $database);
 $query = "SELECT * FROM Property WHERE ApprovedBy IS NOT NULL";
 
-echo "<h2>Confirmed Properties</h2>";
-echo "<table>";
-echo "<tr>";
-echo "<th>Name<a href='confirmed_properties.php?sort_name=0'>↑</a> <a href='confirmed_properties.php?sort_name=1'>↓</a></th>";
-echo "<th>Street</th>";
-echo "<th>City</th>";
-echo "<th>Zip</th>";
-echo "<th>Size<a href='confirmed_properties.php?sort_size=0'>↑</a> <a href='confirmed_properties.php?sort_size=1'>↓</a></th>";
-echo "<th>PropertyType<a href='confirmed_properties.php?sort_propertyType=0'>↑</a> <a href='confirmed_properties.php?sort_propertyType=1'>↓</a></th>";
-echo "<th>Public</th>";
-echo "<th>Commercial</th>";
-echo "<th>ID</th>";
-echo "<th>Owner<a href='confirmed_properties.php?sort_owner=0'>↑</a> <a href='confirmed_properties.php?sort_owner=1'>↓</a></th>";
-echo "<th>ApprovedBy<a href='confirmed_properties.php?sort_approvedBy=0'>↑</a> <a href='confirmed_properties.php?sort_approvedBy=1'>↓</a></th>";
-echo "<th>Avg. Rating<a href='confirmed_properties.php?sort_avgRating=0'>↑</a> <a href='confirmed_properties.php?sort_avgRating=1'>↓</a></th>";
-echo "</tr>";
-echo "<tr>";
+echo <<<EOT
+<div class="main">
+    <div class="topBar"></div>
+    <div class="title">All Confirmed Properties</div>
+    <div class="table-div">
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>ID<span id="sort_id" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_id', 0)"></i></span></th>
+                    <th>Name<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_name', 1)"></i></span></th>
+                    <th>Street<span id="sort_street" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_street', 2)"></i></span></th>
+                    <th>City<span id="sort_city" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_city', 3)"></i></span></th>
+                    <th>Zip<span id="sort_zip" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_zip', 4)"></i></span></th>
+                    <th>Size<span id="sort_size" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_size', 5)"></i></span></th>
+                    <th>Property Type<span id="sort_propertyType" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_propertyType', 6)"></i></span></th>
+                    <th>isPublic<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_public', 7)"></i></span></th>
+                    <th>isCommercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_commercial', 8)"></i></span></th>
+                    <th>Verified By<span id="sort_approvedBy" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_approvedBy', 9)"></i></span></th>
+                    <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_rating', 10)"></i></span></th>
+                </tr>
+            </thead>
+EOT;
 
-if(isset($_GET['sort_name'])) {
-    $temp_order = $_GET['sort_name'];
-    if($temp_order==0) {
-        $query = $query. " order by Name asc";
-    } else {
-        $query = $query. " order by Name desc";
-    }
-}
-
-if(isset($_GET['sort_size'])) {
-    $temp_order = $_GET['sort_size'];
-    if($temp_order==0) {
-        $query = $query. " order by Size asc";
-    } else {
-        $query = $query. " order by Size desc";
-    }
-}
-
-if(isset($_GET['sort_owner'])) {
-    $temp_order = $_GET['sort_owner'];
-    if($temp_order==0) {
-        $query = $query. " order by Owner asc";
-    } else {
-        $query = $query. " order by Owner desc";
-    }
-}
-
-if(isset($_GET['sort_propertyType'])) {
-    $temp_order = $_GET['sort_propertyType'];
-    if($temp_order==0) {
-        $query = $query. " order by PropertyType asc";
-    } else {
-        $query = $query. " order by PropertyType desc";
-    }
-}
-
-if(isset($_GET['sort_approvedBy'])) {
-    $temp_order = $_GET['sort_approvedBy'];
-    if($temp_order==0) {
-        $query = $query. " order by ApprovedBy asc";
-    } else {
-        $query = $query. " order by ApprovedBy desc";
-    }
-}
-
-if(isset($_GET['sort_avgRating'])) {
-    $temp_order = $_GET['sort_avgRating'];
-    if($temp_order==0) {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL
-                  GROUP BY p.ID
-                  ORDER BY AVG(v.Rating) ASC";
-    } else {
-        $query = "SELECT p.* FROM Property AS p
-                  LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                  WHERE p.ApprovedBy IS NOT NULL
-                  GROUP BY p.ID
-                  ORDER BY AVG(v.Rating) DESC";
-    }
-}
-
-$result = mysqli_query($connection, $query);
-
-if(isset($_POST['SearchBy'])) {
-    $attr = $_POST['SearchBy'];
-    if(isset($_POST['SearchTerm'])){
-        $SearchTerm = $_POST['SearchTerm'];
+if (isset($_POST["SearchBy"]))
+{
+    $attr = $_POST["SearchBy"];
+    if (isset($_POST["SearchTerm"]))
+    {
+        $SearchTerm = $_POST["SearchTerm"];
         $query .= " AND ($attr LIKE '%$SearchTerm%')";
-        $result = mysqli_query($connection, $query);
-    } elseif(isset($_POST['From']) && isset($_POST['To'])) {
-        $From = $_POST['From'];
-        $To = $_POST['To'];
-        if(is_numeric($From) && is_numeric($To)) {
-            $query .= " AND (ID IN (SELECT p.ID FROM Property as p
-                                    LEFT JOIN Visit AS v ON p.ID = v.PropertyID
-                                    GROUP BY p.ID
-                                    HAVING AVG(v.Rating) >= $From AND AVG(v.Rating) <= $To))";
-            $result = mysqli_query($connection, $query);
+    }
+    elseif (isset($_POST["From"]) && isset($_POST["To"]))
+    {
+        $From = $_POST["From"];
+        $To = $_POST["To"];
+        if (is_numeric($From) && is_numeric($To))
+        {
+            if ($attr == "Size")
+                $query .= " AND (ID IN (SELECT p.ID FROM Property as p
+                                               WHERE p.Size >= $From AND p.Size <= $To))";
+            elseif ($attr == "Rating")
+                $query .= " AND (ID IN (SELECT p.ID FROM Property as p
+                                               LEFT JOIN Visit AS v ON p.ID = v.PropertyID
+                                               GROUP BY p.ID
+                                               HAVING AVG(v.Rating) >= $From AND AVG(v.Rating) <= $To))";
         }
     }
 }
 
-if($result != False && mysqli_num_rows($result) > 0) {
-    while($row = mysqli_fetch_assoc($result))
+$result = $connection->query($query);
+
+if ($result != False && $result->num_rows > 0)
+{
+    echo "<tbody>";
+    while($row = $result->fetch_assoc())
     {
+        echo "<tr>";
+        echo "<td>";
+        $tmp_ID = str_pad($row['ID'], 5, '0', STR_PAD_LEFT);
+        echo "<a href='admin_manage_property.php?ID=$tmp_ID'>" . $tmp_ID . "</a>";
+        echo "</td>";
         echo "<td>" .$row['Name']. "</td>";
         echo "<td>" .$row['Street']. "</td>";
         echo "<td>" .$row['City']. "</td>";
         echo "<td>" .$row['Zip']. "</td>";
-        echo "<td>" .$row['Size']. "</td>";
-        echo "<td>" .$row['PropertyType']. "</td>";
-        echo "<td>" .$row['IsPublic']. "</td>";
-        echo "<td>" .$row['IsCommercial']. "</td>";
-        echo "<td>" .str_pad($row['ID'], 5, '0', STR_PAD_LEFT). "</td>";
-        echo "<td>" .$row['Owner']. "</td>";
+        echo "<td>" .number_format($row['Size'], 1). "</td>";
+        echo "<td>" .ucwords(strtolower($row['PropertyType'])). "</td>";
+        echo "<td>" .(boolval($row["IsPublic"])? "True" : "False"). "</td>";
+        echo "<td>" .(boolval($row["IsCommercial"])? "True" : "False"). "</td>";
         echo "<td>" .$row['ApprovedBy']. "</td>";
-        echo "<td>";
-        $tmp_ID = $row['ID'];
-        $avgRating_query = "SELECT AVG(Rating) as avgRating FROM Visit WHERE PropertyID = '$tmp_ID'";
-        $avgRating_result = mysqli_query($connection, $avgRating_query);
-        $tmp_row = mysqli_fetch_assoc($avgRating_result);
-        if(is_numeric($tmp_row['avgRating'])){
-            echo number_format($tmp_row['avgRating'], 2);
-        }
-        echo "</td>";
-        echo "<td><a href='admin_manage_property.php?ID=".$row['ID']."'>Manage</a></td>";
+        $avgRating_query = "SELECT AVG(Rating) as avgRating FROM Visit WHERE PropertyID = $tmp_ID";
+        $avgRating_result = $connection->query($avgRating_query);
+        $tmp_row = $avgRating_result->fetch_assoc();
+        echo "<td>" .number_format($tmp_row["avgRating"], 2). "</td>";
         echo "</tr>";
-        echo "<tr>";
     }
-    echo "</tr>";
-}
-else {
-    echo "No Confirmed Property";
+    echo "</tbody>";
 }
 echo "</table>";
+echo "</div>";
 
+echo "<div id='bottom-fields'>";
 // Search by
-echo "<form action='confirmed_properties.php' method='post'>
-          <select id='adminSearch' onchange='searchRange()' name='SearchBy'>
-              <option value='' disabled selected>Search by</option>
-              <option value='Name'>Name</option>
-              <option value='Street'>Street</option>
-              <option value='City'>City</option>
-              <option value='Zip'>Zip</option>
-              <option value='Size'>Size</option>
-              <option value='PropertyType'>PropertyType</option>
-              <option value='IsPublic'>Public</option>
-              <option value='IsCommercial'>Commercial</option>
-              <option value='ID'>ID</option>
-              <option value='Owner'>Owner</option>
-              <option value='ApprovedBy'>ApprovedBy</option>
-              <option value='Avg. Rating'>Avg. Rating</option>
-          </select><br>
-          <span id='term'><input type='text' placeholder='Search Term' name='SearchTerm'><br></span>
-          <input value='Search Properties' type='submit'>
-    </form>";
+echo <<<EOT
+    <div class="col-33">
+        <div class="fields">
+            <form action="confirmed_properties.php" method="post">
+                <div>
+                    <select id="adminSearch" onchange="searchRange('adminSearch')" name="SearchBy">
+                        <option value="" disabled selected>Search by</option>
+                        <option value="ID">ID</option>
+                        <option value="Name">Name</option>
+                        <option value="Street">Street</option>
+                        <option value="City">City</option>
+                        <option value="Zip">Zip</option>
+                        <option value="Size">Size</option>
+                        <option value="PropertyType">Property Type</option>
+                        <option value="ApprovedBy">Verified By</option>
+                        <option value="Rating">Rating</option>
+                    </select>
+                </div>
+                <div id="term-input">
+                    <input class="term" type="text" placeholder="Search Term" name="SearchTerm">
+                </div>
+                <div>
+                    <input class="button" value="Search Properties" type="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+EOT;
 
-if(isset($_SESSION["adminName"])) {
-    echo "<a href='admin_menu.php?name=".$_SESSION["adminName"]."'>Back</a><br/>";
-}
+echo <<<EOT
+    <div class="col-33">
+        <div class="fields">
+            <div>
+                <form action="admin_manage_property.php?ID=" id="confirmed_property_form" method="post">
+                    <input id="invisible_field" type="text" class="button" placeholder="Select a property" required>
+                    <input class="button" type="Submit" value="Manage Selected Property">
+                    <div class="tooltip">
+                        <i class='fa fa-info-circle'></i>
+                        <span class="tooltiptext">Click a row</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+EOT;
 
-mysqli_close($connection);
+echo <<<EOT
+    <div class="col-33">
+        <div class="fields">
+            <input class="button" type="button" onclick="location.href='admin_menu.php';" value="Back">
+        </div>
+    </div>
+EOT;
+echo "</div>";
+
+echo "</div>"; // For div "main"
+
+$connection->close();
 ?>
 
-<script>
-function searchRange() {
-    var x = document.getElementById('adminSearch').value;
-    if(x=='Avg. Rating'){
-        document.getElementById('term').innerHTML = "<input type='text' placeholder='From...' name='From'> - <input type='text' placeholder='To...' name='To'><br>";
-    } else {
-        document.getElementById('term').innerHTML = "<input type='text' placeholder='Search Term' name='SearchTerm'><br>";
-    }
-}
-</script>
+<script>selectRow(["confirmed_property_form"], "action");</script>
 
 </body>
 </html>
