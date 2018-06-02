@@ -1,150 +1,162 @@
-<html>
-<body>
 <?php
 session_start();
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Visitors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        .main {
+            height: 450px;
+        }
+
+        .col-33 .fields .button,
+        .col-33 .fields select,
+        .col-33 .fields .term {
+            width: 90%;
+        }
+
+        .col-33 .fields .range {
+            width: 41.6%;
+        }
+    </style>
+    <script src="helperFunctions.js"></script>
+</head>
+<body>
+<?php
 require 'dbinfo.php';
 
-echo "<h1>All Visitors In System</h1>";
-
-$connection = mysqli_connect($host, $usernameDB, $passwordDB, $database);
-if(isset($_GET['delete_visitor'])) {
-    $temp_username = $_GET['delete_visitor'];
-    $delete_query = "Delete from User where Username='$temp_username'";
-    mysqli_query($connection, $delete_query);
-}
-
-if(isset($_GET['delete_log'])) {
-    $temp_username = $_GET['delete_log'];
-    $delete_query = "Delete from Visit where Username='$temp_username'";
-    mysqli_query($connection, $delete_query);
-}
-
+$connection = new mysqli($host, $usernameDB, $passwordDB, $database);
 $query = "SELECT * FROM User WHERE UserType='VISITOR'";
 
-
-echo "<table>";
-echo "<tr>";
-echo "<th>Username <a href='view_visitors.php?sort_name=0'>↑</a> <a href='view_visitors.php?sort_name=1'>↓</a></th>";
-echo "<th>Email<a href='view_visitors.php?sort_email=0'>↑</a> <a href='view_visitors.php?sort_email=1'>↓</a></th>";
-echo "<th>Visits<a href='view_visitors.php?sort_loggedvisits=0'>↑</a> <a href='view_visitors.php?sort_loggedvisits=1'>↓</a></th>";
-echo "</tr>";
-echo "<tr>";
-
-if(isset($_GET['sort_name'])) {
-    $temp_order = $_GET['sort_name'];
-    if($temp_order==0) {
-        $query = $query. " order by username asc";
-    } else {
-        $query = $query. " order by username desc";
-    }
+if (isset($_POST['visitor_to_delete']))
+{
+    $temp_username = $_POST['visitor_to_delete'];
+    $delete_query = "Delete from User where Username='$temp_username'";
+    $connection->query($delete_query);
 }
 
-if(isset($_GET['sort_email'])) {
-    $temp_order = $_GET['sort_email'];
-    if($temp_order==0) {
-        $query = $query. " order by email asc";
-    } else {
-        $query = $query. " order by email desc";
-    }
+if (isset($_POST['log_to_delete']))
+{
+    $temp_username = $_POST['log_to_delete'];
+    $delete_query = "Delete from Visit where Username='$temp_username'";
+    $connection->query($delete_query);
 }
 
-if(isset($_GET['sort_loggedvisits'])) {
-    $temp_order = $_GET['sort_loggedvisits'];
-    if($temp_order==0) {
-        $query = "SELECT u.* FROM User AS u
-                  LEFT JOIN Visit AS v ON u.Username = v.Username
-                  WHERE u.UserType='VISITOR'
-                  GROUP BY u.Username
-                  ORDER BY COUNT(v.Username) ASC";
-    } else {
-        $query = "SELECT u.* FROM User AS u
-                  LEFT JOIN Visit AS v ON u.Username = v.Username
-                  WHERE u.UserType='VISITOR'
-                  GROUP BY u.Username
-                  ORDER BY COUNT(v.Username) DESC";
-    }
-}
-
-if(isset($_POST['SearchBy'])) {
+if (isset($_POST['SearchBy']))
+{
     $attr = $_POST['SearchBy'];
-    if(isset($_POST['SearchTerm'])){
+    if (isset($_POST['SearchTerm']))
+    {
         $SearchTerm = $_POST['SearchTerm'];
         $query .= " AND ($attr LIKE '%$SearchTerm%')";
-        $result = mysqli_query($connection, $query);
-    } elseif(isset($_POST['From']) && isset($_POST['To'])) {
+    }
+    elseif (isset($_POST['From']) && isset($_POST['To']))
+    {
         $From = $_POST['From'];
         $To = $_POST['To'];
-        if(is_numeric($From) && is_numeric($To)) {
-            if($attr=='visit'){
+        if(is_numeric($From) && is_numeric($To))
+        {
+            if ($attr == 'Visits')
+            {
                 $query .= " AND (Username IN (SELECT u.Username FROM User as u
                                                LEFT JOIN Visit AS v ON u.Username = v.Username
                                                GROUP BY u.Username
                                                HAVING COUNT(v.Username) >= $From AND COUNT(v.Username) <= $To))";
             }
-            $result = mysqli_query($connection, $query);
         }
     }
 }
 
-$result = mysqli_query($connection, $query);
+echo <<<EOT
+<div class="main">
+    <div class="topBar"></div>
+    <div class="title">All Visitors In System</div>
+    <div class="table-div">
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Username<span id="sort_name" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_name', 0)"></i></span></th>
+                    <th>Email<span id="sort_email" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_email', 1)"></i></span></th>
+                    <th>Visits<span id="sort_visits" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_visits', 2)"></i></span></th>
+                </tr>
+            </thead>
+EOT;
 
-if(mysqli_num_rows($result) > 0) {
-    while($row = mysqli_fetch_assoc($result))
+$result = $connection->query($query);
+
+if ($result->num_rows > 0)
+{
+    echo "<tbody>";
+    while($row = $result->fetch_assoc())
     {
-        echo "<td>";
+        echo "<tr>";
         $temp_user = $row['Username'];
         $count_query = "select count(Username) as visit_number from Visit where Username='$temp_user'";
-        $count_result = mysqli_query($connection, $count_query);
-        echo $temp_user;
-        echo "</td>";
-        echo "<td>";
-        echo $row['Email'];
-        echo "</td>";
-        echo "<td>";
-        $data=mysqli_fetch_assoc($count_result);
-        echo $data['visit_number'];
-        echo "</td>";
-        echo "<td><a href='view_visitors.php?delete_visitor=".$temp_user."'>Delete Visitor</a></td>";
-        echo "<td><a href='view_visitors.php?delete_log=".$temp_user."'>Delete Log</a></td>";
+        $count_result = $connection->query($count_query);
+        $data = $count_result->fetch_assoc();
+        echo "<td>" . $temp_user . "</td>";
+        echo "<td>" . $row['Email'] . "</td>";
+        echo "<td>" . $data['visit_number'] . "</td>";
         echo "</tr>";
-        echo "<tr>";
     }
-    echo "</tr>";
-}
-else {
-    echo "No visitor stored";
+    echo "</tbody>";
 }
 echo "</table>";
+echo "</div>";
 
+echo "<div id='bottom-fields'>";
 // Search by
-echo "<form action='view_visitors.php' method='post'>
-          <select id='adminSearchVisitor' onchange='searchRange()' name='SearchBy'>
-              <option value='' disabled selected>Search by</option>
-              <option value='username'>Username</option>
-              <option value='email'>Email</option>
-              <option value='visit'>Visits</option> 
-          </select><br>
-          <span id='term'><input type='text' placeholder='Search Term' name='SearchTerm'><br></span>
-          <input value='Search Visitors' type='submit'>
-    </form>";
+echo <<<EOT
+    <div class="col-33">
+        <div class="fields">
+            <form action="view_visitors.php" method="post">
+                <div>
+                    <select id="adminSearchVisitor" onchange="searchRange('adminSearchVisitor')" name="SearchBy">
+                        <option value="" disabled selected>Search by</option>
+                        <option value="Username">Username</option>
+                        <option value="Email">Email</option>
+                        <option value="Visits">Visits</option>
+                    </select>
+                </div>
+                <div id="term-input">
+                    <input class="term" type="text" placeholder="Search Term" name="SearchTerm">
+                </div>
+                <div>
+                    <input class="button" value="Search Visitors" type="submit">
+                </div>
+            </form>
+        </div>
+    </div>
+EOT;
 
-if(isset($_SESSION["adminName"])) {
-    echo "<a href='admin_menu.php?name=".$_SESSION["adminName"]."'>Back</a><br/>";
-}
+echo <<<EOT
+    <div class="col-33">
+        <div class="fields">
+            <div>
+                <form action="view_visitors.php" method="post">
+                    <input type="hidden" id="visitor_to_delete" name="visitor_to_delete" value="">
+                    <input class="button" type="Submit" value="Delete Visitor">
+                </form>
+                <form action="view_visitors.php" method="post">
+                    <input type="hidden" id="log_to_delete" name="log_to_delete" value="">
+                    <input class="button" type="submit" value="Delete Log History">
+                </form>
+                <input class="button" type="button" onclick="location.href='admin_menu.php';" value="Back">
+            </div>
+        </div>
+    </div>
+EOT;
+echo "</div>";
+echo "</div>"; // For div "main"
 
-mysqli_close($connection);
+$connection->close();
 ?>
 
-<script>
-function searchRange() {
-    var x = document.getElementById('adminSearchVisitor').value;
-    if(x=='visit'){
-        document.getElementById('term').innerHTML = "<input type='text' placeholder='From' name='From'> - <input type='text' placeholder='To' name='To'><br>";
-    } else {
-        document.getElementById('term').innerHTML = "<input type='text' placeholder='Search Term' name='SearchTerm'><br>";
-    }
-}
-</script>
+<script>selectRow(["visitor_to_delete", "log_to_delete"]);</script>
 
 </body>
 </html>
