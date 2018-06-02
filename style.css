@@ -211,14 +211,6 @@ th, td {
     padding: 3px;
 }
 
-tr:nth-child(even) {
-    background-color: #FFFFFF;
-}
-
-tr:hover {
-    background-color: #D4D4D4;
-}
-
 th {
     position: -webkit-sticky;
     position: sticky;
@@ -229,8 +221,21 @@ th {
     background-color: #CCCCCC;
 }
 
-tr {
+tbody tr:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+tbody tr:hover {
+    background-color: #D4D4D4;
+    cursor: pointer;
+}
+
+tbody tr {
     font-weight: normal;
+}
+
+#selected {
+    background-color: #D4D4D4;
 }
 
 #bottom-fields {
@@ -266,7 +271,7 @@ tr {
     padding: 3px 8px;
     font-family: "Times New Roman", Times, serif;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.1em;
     text-align: center;
 }
 
@@ -295,4 +300,10 @@ table a:hover {
 
 .detail .right {
     font-weight: normal;
+}
+
+#invisible_field {
+    display: none;
+    background-color: #FFFFFF;
+    text-align: left;
 }
