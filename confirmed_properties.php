@@ -24,8 +24,9 @@ session_start();
 <body>
 <?php
 require 'dbinfo.php';
-
 $connection = new mysqli($host, $usernameDB, $passwordDB, $database);
+
+$_SESSION["Current_Page"] = htmlspecialchars($_SERVER["PHP_SELF"]);
 $query = "SELECT * FROM Property WHERE ApprovedBy IS NOT NULL";
 
 echo <<<EOT

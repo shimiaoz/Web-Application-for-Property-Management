@@ -22,9 +22,10 @@ session_start();
     }
 
     .button-bottom {
-        margin-top: 25px;
+        margin-top: 20px;
     }
     </style>
+    <script src="helperFunctions.js"></script>>
 </head>
 <body>
 <?php
@@ -208,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         <div class="row">
             <div class="label-col"><label>Property Type:</label></div>
             <div class="input-col short">
-                <select id="propertySelect" name="property_type" onchange="change()" required>
+                <select id="propertySelect" name="property_type" onchange="animalOption()" required>
                     <option value="" disabled <?php if (empty($property_type)) {echo "selected";} ?>>Select</option>
                     <?php
                         $property_array = array("Farm", "Garden", "Orchard");
@@ -220,23 +221,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                                 $selected = "";
                             $format = "<option value=%s %s>%s</option><br/>";
                             echo sprintf($format, strtoupper($property_tmp), $selected, $property_tmp);
-                        }
-                    ?>
-                </select>
-            </div>
-            <div class="label-col short"><label>Animal:</label></div>
-            <div class="input-col short">
-                <select id='animalSelect' name="animal" required>
-                    <option value="" disabled selected>Select</option>
-                    <?php
-                        $animal_list = $connection->query("SELECT * FROM FarmItem WHERE IsApproved = 1 AND Type = 'ANIMAL'");
-                        if ($animal_list->num_rows > 0)
-                        {
-                            while ($row = $animal_list->fetch_assoc())
-                            {
-                                $tmp = $row['Name'];
-                                echo "<option value='$tmp'>" . $tmp . "</option>";
-                            }
                         }
                     ?>
                 </select>
@@ -257,6 +241,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                         }
                     ?>
                 </select>
+            </div>
+            <div id="animalSelect">
+                <div class="label-col short"><label>Animal:</label></div>
+                <div class="input-col short">
+                    <select name="animal" required>
+                        <option value="" disabled selected>Select</option>
+                        <?php
+                            $animal_list = $connection->query("SELECT * FROM FarmItem WHERE IsApproved = 1 AND Type = 'ANIMAL'");
+                            if ($animal_list->num_rows > 0)
+                            {
+                                while ($row = $animal_list->fetch_assoc())
+                                {
+                                    $tmp = $row['Name'];
+                                    echo "<option value='$tmp'>" . $tmp . "</option>";
+                                }
+                            }
+                        ?>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -285,16 +288,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 <?php
 $connection->close();
 ?>
-
-<script>
-function change() {
-    var x = document.getElementById('propertySelect').value;
-    if (x == 'FARM')
-        document.getElementById('animalSelect').disabled = false;
-    else
-        document.getElementById('animalSelect').disabled = true;
-}
-</script>
 
 </body>
 </html>

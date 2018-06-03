@@ -89,3 +89,23 @@ function selectRow(idList, type="") {
         };
     }
 }
+
+function animalOption() {
+    var x = document.getElementById("propertySelect").value;
+    if (x == "FARM")
+        document.getElementById("animalSelect").style.display = "block";
+    else
+        document.getElementById("animalSelect").style.display = "none";
+}
+
+function changeDisplay() {
+    var property_type = document.getElementById("ptype").innerHTML;
+    if (property_type != "Farm") {
+        var elements = document.getElementsByClassName("forFarm");
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.display = "none";
+        }
+        document.getElementById("item_row").style.boxSizing = "border-box";
+        document.getElementById("item_row").style.paddingLeft = "7.3%";
+    }
+}

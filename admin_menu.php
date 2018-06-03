@@ -19,7 +19,7 @@ session_start();
 </head>
 <body>
 <?php
-$username = $_SESSION["USER"]["Username"];
+$username = $_SESSION["User"]["Username"];
 echo <<<EOT
 <div class="main">
     <div class="topBar"></div>

@@ -56,23 +56,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
         if ($result->num_rows == 1)
         {
             $row = $result->fetch_assoc();
+            $username = $row["Username"];
             // Check UserType and redirect to the corresponding main page
             if ($row["UserType"] == "OWNER")
             {
-                $_SESSION["USER"] = array("UserType"=>"OWNER", "Username"=>$row["Username"]);
-                header("Location: owner_function.php?email=$email");
+                $_SESSION["User"] = array("UserType"=>"OWNER", "Username"=>$username);
+                header("Location: owner_main_page.php?name=$username");
             }
             elseif($row["UserType"] == "VISITOR")
             {
-                $_SESSION["USER"] = array("UserType"=>"VISITOR", "Username"=>$row["Username"]);
-                $visitor_username = $row["Username"];
-                header("Location: visitor_main_page.php?name=$visitor_username");
+                $_SESSION["User"] = array("UserType"=>"VISITOR", "Username"=>$username);
+                header("Location: visitor_main_page.php?name=$username");
             }
             elseif($row["UserType"] == "ADMIN")
             {
-                $_SESSION["USER"] = array("UserType"=>"ADMIN", "Username"=>$row["Username"]);
-                $admin_username = $row["Username"];
-                header("Location: admin_menu.php?name=$admin_username");
+                $_SESSION["User"] = array("UserType"=>"ADMIN", "Username"=>$username);
+                header("Location: admin_menu.php?name=$username");
             }
         }
         else

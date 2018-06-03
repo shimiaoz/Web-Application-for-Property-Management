@@ -68,14 +68,8 @@ session_start();
         border-left: 0px;
     }
 
-    #bottom-fields {
-        height: 0;
-        margin-top: 36px;
-    }
-
-    .col-left .button {
-        margin-bottom: 6px;
-        width: 75%;
+    #delete_property_form {
+        display: inline-block;
     }
     </style>
     <script src="helperFunctions.js"></script>
@@ -84,8 +78,6 @@ session_start();
 <?php
 require 'dbinfo.php';
 $connection = new mysqli($host, $usernameDB, $passwordDB, $database);
-
-$Previous_Page = $_SESSION["Current_Page"];
 
 $username = $_SESSION["User"]["Username"];
 $propertyID = $_GET['ID'];
@@ -102,12 +94,7 @@ if (isset($_POST['update_property']))
     $isCommercial = $_POST['isCommercial'];
 
     // Update property
-    $result = $connection->query($query);
-    $row = $result->fetch_assoc();
-    if (empty($row["ApprovedBy"]))
-        $query_property = "UPDATE Property SET Name=?, Street=?, City=?, Zip=?, Size =?, IsPublic=?, IsCommercial=?, ApprovedBy='$username' WHERE ID=?";
-    else
-        $query_property = "UPDATE Property SET Name=?, Street=?, City=?, Zip=?, Size =?, IsPublic=?, IsCommercial=? WHERE ID=?";
+    $query_property = "UPDATE Property SET Name=?, Street=?, City=?, Zip=?, Size =?, IsPublic=?, IsCommercial=? WHERE ID=?";
     $stmt_property = $connection->prepare($query_property);
     $stmt_property->bind_param("sssidssi", $property_name, $street, $city, $zip, $acres, $isPublic, $isCommercial, $propertyID);
     $stmt_property->execute();
@@ -134,10 +121,17 @@ elseif (isset($_POST["delete_crop"]) || isset($_POST["delete_animal"]))
     $query_item = "DELETE FROM Has WHERE PropertyID = '$propertyID' AND ItemName = '$item'";
     $connection->query($query_item);
 }
+elseif (isset($_POST["request_item"]))
+{
+    $item_name = $_POST["new_item_name"];
+    $item_type = $_POST["new_item_type"];
+    $query_request = "INSERT INTO FarmItem VALUES('$item_name', 0, '$item_type')";
+    $connection->query($query_request);
+}
 elseif (isset($_POST["delete_property"])) {
     $query_delete = "DELETE FROM Property WHERE ID = '$propertyID'";
     $connection->query($query_delete);
-    header("Location: $Previous_Page");
+    header("Location: owner_main_page.php?name=$username");
 }
 
 $result = $connection->query($query);
@@ -313,16 +307,30 @@ $row = $result->fetch_assoc();
         </div>
     </div>
 
-    <div id="bottom-fields">
-        <div <div class="col-left">
-            <input class="button" type="submit" form="update_property" name="update_property" value="Save Changes (Confirm)">
-            <input class="button" type="button" onclick="location.href='<?php echo $Previous_Page; ?>';" value="Back (Don't Save or Confirm)">
-        </div>
-        <div class="col-right">
+    <div class="row">
+        <div class="request">
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?ID=$propertyID"; ?>" method="post">
-                <input class="button" type="submit" name="delete_property" value="Delete Property">
+                <label>Request <span class="forFarm">Animal/</span>Crop Approval:</label>
+                <select name="new_item_type">
+                    <option value="" disabled selected>Select Type</option>
+                    <option class="forFarm" value="ANIMAL">Animal</option>
+                    <option value="FRUIT">Fruit</option>
+                    <option value="FLOWER">Flower</option>
+                    <option value="VEGETABLE">Vegetable</option>
+                    <option value="NUT">Nut</option>
+                </select>
+                <input type="text" name="new_item_name" placeholder="Enter name">
+                <input type="submit" name="request_item" value="Submit Request">
             </form>
         </div>
+    </div>
+
+    <div class="button-bottom">
+        <form id="delete_property_form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . "?ID=$propertyID"; ?>" method="post">
+            <input class="button" type="submit" name="delete_property" value="Delete Property">
+        </form>
+        <input class="button" type="submit" form="update_property" name="update_property" value="Save Changes">
+        <input class="button" type="button" onclick="location.href='owner_main_page.php<?php echo "?name=$username"; ?>';" value="Back (Don't Save)">
     </div>
 </div>
 

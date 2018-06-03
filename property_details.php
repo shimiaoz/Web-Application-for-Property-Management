@@ -20,15 +20,14 @@ session_start();
 
 <?php
 require 'dbinfo.php';
+$connection = new mysqli($host, $usernameDB, $passwordDB, $database);
 
 $Previous_Page = $_SESSION["Current_Page"];
-
 $PropertyID = $_GET['ID'];
-$connection = new mysqli($host, $usernameDB, $passwordDB, $database);
+$username = $_SESSION["User"]["Username"];
 
 if (isset($_POST["rate"]))
 {
-    $username = $_SESSION["USER"]["Username"];
     $date = date('Y-m-d H:i:s');
     $rate = $_POST["rate"];
     $query_log = "INSERT INTO Visit VALUES ('$username', '$PropertyID', '$date', '$rate')";
@@ -36,7 +35,6 @@ if (isset($_POST["rate"]))
 }
 elseif (isset($_POST["unlog"]))
 {
-    $username = $_SESSION["USER"]["Username"];
     $query_unlog = "DELETE FROM Visit WHERE Username='$username' AND PropertyID='$PropertyID'";
     $connection->query($query_unlog);
 }
@@ -104,17 +102,19 @@ if ($query5_result->num_rows > 0)
 else
     echo "<br />";
 
-if (strcmp($_SESSION["USER"]["UserType"], "OWNER") == 0)
+if (strcmp($_SESSION["User"]["UserType"], "OWNER") == 0)
 {
-echo <<<EOT
+    if (strpos($Previous_Page, "owner_main_page") !== false)
+        $Previous_Page .= "?name=$username";
+    
+    echo <<<EOT
     <div class="button-bottom">
-        <input class="button" type="button" onclick="location.href='login.php';" value="Back">
+        <input class="button" type="button" onclick="location.href='$Previous_Page';" value="Back">
     </div>
 EOT;
 }
-elseif (strcmp($_SESSION["USER"]["UserType"], "VISITOR") == 0)
+elseif (strcmp($_SESSION["User"]["UserType"], "VISITOR") == 0)
 {
-    $username = $_SESSION["USER"]["Username"];
     $query_visited = "SELECT * FROM Visit WHERE Username='$username' AND PropertyID='$PropertyID'";
     $query_visited_result = $connection->query($query_visited);
 

@@ -64,7 +64,9 @@ body {
 }
 
 .input-col input,
-.input-col select {
+.input-col select,
+.request input,
+.request select {
     box-sizing: border-box;
     width: 72%;
     border: 0.5px solid;
@@ -94,6 +96,11 @@ input[type=number]::-webkit-outer-spin-button {
 
 .errMessage {
     color: #FF0000;
+}
+
+.message {
+    padding-top: 4px;
+    color: #005DB8;
 }
 
 i.fa.fa-exclamation-circle {
@@ -245,8 +252,8 @@ tbody tr {
 .col-33 {
     box-sizing: border-box;
     position: relative;
-    display: inline-block;
-    width: 33%;
+    float: left;
+    width: 33.3%;
     height: 100%;
     text-align: center;
     vertical-align: bottom;
@@ -278,6 +285,28 @@ tbody tr {
 .col-33 .fields .range {
     width: 28.3%;
     text-align: left;
+}
+
+.col-left {
+    float: left;
+    width: 60%;
+}
+
+.col-right {
+    float: left;
+    width: 40%;
+}
+
+.col-right .label-col {
+    width: 45%;
+}
+
+.col-right .input-col {
+    width: 55%;
+}
+
+.col-right .input-col select {
+    width: 60%;
 }
 
 a {

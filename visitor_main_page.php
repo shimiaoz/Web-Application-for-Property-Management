@@ -30,7 +30,7 @@ $_SESSION["Current_Page"] = htmlspecialchars($_SERVER["PHP_SELF"]);
 $connection = new mysqli($host, $usernameDB, $passwordDB, $database);
 $query = "SELECT * FROM Property WHERE ApprovedBy IS NOT NULL AND IsPublic = 1";
 
-$username = $_GET['name'];
+$username = $_SESSION["User"]["Username"];
 echo <<<EOT
 <div class="main">
     <div class="topBar"></div>
@@ -47,8 +47,8 @@ echo <<<EOT
                     <th>Zip<span id="sort_zip" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_zip', 4)"></i></span></th>
                     <th>Size<span id="sort_size" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_size', 5)"></i></span></th>
                     <th>Property Type<span id="sort_propertyType" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_propertyType', 6)"></i></span></th>
-                    <th>isPublic<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_public', 7)"></i></span></th>
-                    <th>isCommercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_commercial', 8)"></i></span></th>
+                    <th>Public<span id="sort_public" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_public', 7)"></i></span></th>
+                    <th>Commercial<span id="sort_commercial" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_commercial', 8)"></i></span></th>
                     <th>Visits<span id="sort_visits" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_visits', 9)"></i></span></th>
                     <th>Rating<span id="sort_rating" class="sort-icon"><i class="fa fa-chevron-circle-down" title="Asc" onclick="sortTable('sort_rating', 10)"></i></span></th>
                 </tr>
